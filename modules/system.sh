@@ -27,3 +27,7 @@ get_architecture() {
 get_uptime() {
     uptime
 }
+
+get_shell_name() {
+    echo $SHELL
+}
