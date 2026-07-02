@@ -1,10 +1,17 @@
 #!/bin/bash
 
+RED="\033[0;31m"
+GREEN="\033[0;32m"
+YELLOW="\033[1;33m"
+BLUE="\033[0;34m"
+RESET="\033[0m"
+
 print_header() {
 
     printf "\n"
     printf "=============================================\n"
-    printf "               SYSGUARD v0.3\n"
+    printf "               SYSGUARD v0.5\n"
+    printf "    Linux Monitoring & Automation Toolkit\n"
     printf "=============================================\n\n"
 
 }
@@ -15,6 +22,25 @@ print_field() {
     local value="$2"
 
     printf "%-15s : %s\n" "$label" "$value"
+
+}
+
+format_health() {
+
+    case "$1" in
+        HEALTHY)
+            printf "${GREEN}%s${RESET}" "$1"
+            ;;
+        WARNING)
+            printf "${YELLOW}%s${RESET}" "$1"
+            ;;
+        CRITICAL)
+            printf "${RED}%s${RESET}" "$1"
+            ;;
+        *)
+            printf "%s" "$1"
+            ;;
+    esac
 
 }
 
@@ -36,17 +62,17 @@ save_report() {
         print_field "Shell" "$SHELL_NAME"
         print_field "Uptime" "$UPTIME"
 
-        print_field "CPU Health" "$CPU_STATUS"
+        print_field "CPU Health" "$(format_health "$CPU_STATUS")"
         print_field "CPU Model" "$CPU_MODEL"
         print_field "CPU Cores" "$CPU_CORES"
         print_field "CPU Usage" "$CPU_USAGE"
 
-        print_field "Memory Health" "$MEMORY_STATUS"
+        print_field "Memory Health" "$(format_health "$MEMORY_STATUS")"
         print_field "Memory Total" "$MEMORY_TOTAL"
         print_field "Memory Used" "$MEMORY_USED"
         print_field "Memory Free" "$MEMORY_FREE"
 
-        print_field "Disk Health" "$DISK_STATUS"
+        print_field "Disk Health" "$(format_health "$DISK_STATUS")"
         print_field "Disk Usage" "$DISK_USAGE"
         print_field "Disk Free" "$DISK_FREE"
 
@@ -63,7 +89,55 @@ save_report() {
         printf "======== Top Memory Processes ========\n"
         printf "%s\n" "$TOP_MEMORY_PROCESSES"
 
+        print_field "Generated At" "$(date)"
+
     } > "$report_file"
 
     log_info "Report saved: $report_file"
+}
+
+generate_json_report() {
+
+    local json_file="${REPORT_DIRECTORY}/report_$(date +%Y-%m-%d_%H-%M-%S).json"
+
+    cat > "$json_file" <<EOF
+{
+    "hostname": "$HOSTNAME",
+    "user": "$CURRENT_USER",
+    "date": "$CURRENT_DATE",
+    "kernel": "$KERNEL",
+    "architecture": "$ARCHITECTURE",
+    "shell": "$SHELL_NAME",
+    "uptime": "$UPTIME",
+
+    "cpu": {
+        "model": "$CPU_MODEL",
+        "cores": "$CPU_CORES",
+        "usage": "$CPU_USAGE",
+        "status": "$CPU_STATUS"
+    },
+
+    "memory": {
+        "total": "$MEMORY_TOTAL",
+        "used": "$MEMORY_USED",
+        "free": "$MEMORY_FREE",
+        "status": "$MEMORY_STATUS"
+    },
+
+    "disk": {
+        "usage": "$DISK_USAGE",
+        "free": "$DISK_FREE",
+        "status": "$DISK_STATUS"
+    },
+
+    "network": {
+        "local_ip": "$LOCAL_IP",
+        "internet": "$INTERNET"
+    }
+}
+EOF
+
+    log_info "JSON report generated: $json_file"
+
+    printf "\nJSON report saved to: %s\n" "$json_file"
 }

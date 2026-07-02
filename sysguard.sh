@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ##############################################
-# SysGuard v0.3
+# SysGuard v0.5
 ##############################################
 
 set -Eeuo pipefail
@@ -39,6 +39,7 @@ source "${PROJECT_ROOT}/modules/process.sh"
 WATCH_MODE=false
 WATCH_INTERVAL=5
 GENERATE_REPORT=false
+GENERATE_JSON=false
 
 show_help() {
 
@@ -55,6 +56,7 @@ Options
 --help          Show help
 --version       Show version
 --report        Save report
+--json          Save JSON report
 --watch <sec>   Refresh every n seconds
 
 EOF
@@ -71,7 +73,7 @@ do
             ;;
 
         --version)
-            echo "SysGuard v0.3"
+            echo "SysGuard v0.5"
             exit 0
             ;;
 
@@ -80,9 +82,26 @@ do
             shift
             ;;
 
+        --json)
+            GENERATE_JSON=true
+            shift
+            ;;
+
+
         --watch)
             WATCH_MODE=true
             WATCH_INTERVAL="$2"
+
+            if [[ $# -lt 2 ]]; then
+                echo "Error: --watch requires an interval."
+                exit 1
+            fi
+
+            if ! [[ "$WATCH_INTERVAL" =~ ^[0-9]+$ ]]; then
+                echo "Error: Watch interval must be a positive integer."
+                exit 1
+            fi            
+
             shift 2
             ;;
 
@@ -202,14 +221,27 @@ display_dashboard() {
 }
 
 ##############################################
-# Finish
+# Execution
 ##############################################
 
-log_info "SysGuard report generated."
+if $WATCH_MODE
+then
+    while true
+    do
+        clear
+        collect_data
+        display_dashboard
+        sleep "$WATCH_INTERVAL"
+    done
 
-printf "\n"
-printf "SysGuard execution completed successfully.\n"
+    exit 0
+fi
 
+# Normal execution
+collect_data
+display_dashboard
+
+# Optional report
 if $GENERATE_REPORT
 then
     REPORT_FILE=$(generate_report_name)
@@ -219,17 +251,12 @@ then
     printf "Report saved to: %s\n" "$REPORT_FILE"
 fi
 
-if $WATCH_MODE
+if $GENERATE_JSON
 then
-    while true
-    do
-        clear
-
-        collect_data
-        display_dashboard
-
-        sleep "$WATCH_INTERVAL"
-    done
-
-    exit 0
+    generate_json_report
 fi
+
+log_info "SysGuard execution completed."
+
+printf "\n"
+printf "SysGuard execution completed successfully.\n"
