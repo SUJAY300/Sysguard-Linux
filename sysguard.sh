@@ -1,65 +1,134 @@
-#!/bin/bash
+# #!/bin/bash
 
-source modules/system.sh
-source modules/report.sh
-source modules/cpu.sh
-source modules/memory.sh
-source modules/disk.sh
-source modules/network.sh
-source modules/logger.sh
-source modules/health.sh
+# source modules/system.sh
+# source modules/report.sh
+# source modules/cpu.sh
+# source modules/memory.sh
+# source modules/disk.sh
+# source modules/network.sh
+# source modules/logger.sh
+# source modules/health.sh
 
-HOSTNAME=$(get_hostname)
-CURRENT_USER=$(get_current_user)
-CURRENT_DATE=$(get_current_date)
-KERNEL=$(get_kernel_version)
-ARCHITECTURE=$(get_architecture)
-SHELL_NAME=$(get_shell_name)
-UPTIME=$(get_uptime)
+# HOSTNAME=$(get_hostname)
+# CURRENT_USER=$(get_current_user)
+# CURRENT_DATE=$(get_current_date)
+# KERNEL=$(get_kernel_version)
+# ARCHITECTURE=$(get_architecture)
+# SHELL_NAME=$(get_shell_name)
+# UPTIME=$(get_uptime)
 
-CPU_MODEL=$(get_cpu_model)
-CPU_CORES=$(get_cpu_cores)
-CPU_USAGE=$(get_cpu_usage)
-CPU_STATUS=$(health_status "$CPU_USAGE" "$CPU_WARNING" "$CPU_CRITICAL")
+# CPU_MODEL=$(get_cpu_model)
+# CPU_CORES=$(get_cpu_cores)
+# CPU_USAGE=$(get_cpu_usage)
+# CPU_STATUS=$(health_status "$CPU_USAGE" "$CPU_WARNING" "$CPU_CRITICAL")
 
-MEMORY_TOTAL=$(get_memory_total)
-MEMORY_USED=$(get_memory_used)
-MEMORY_FREE=$(get_memory_free)
-MEMORY_PERCENT=$(free | awk '/Mem:/ {printf("%.0f%%",$3/$2*100)}')
-MEMORY_STATUS=$(health_status "$MEMORY_PERCENT" "$MEMORY_WARNING" "$MEMORY_CRITICAL")
+# MEMORY_TOTAL=$(get_memory_total)
+# MEMORY_USED=$(get_memory_used)
+# MEMORY_FREE=$(get_memory_free)
+# MEMORY_PERCENT=$(free | awk '/Mem:/ {printf("%.0f%%",$3/$2*100)}')
+# MEMORY_STATUS=$(health_status "$MEMORY_PERCENT" "$MEMORY_WARNING" "$MEMORY_CRITICAL")
 
-DISK_USAGE=$(get_disk_usage)
-DISK_FREE=$(get_disk_free)
-DISK_STATUS=$(health_status "$DISK_USAGE" "$DISK_WARNING" "$DISK_CRITICAL")
+# DISK_USAGE=$(get_disk_usage)
+# DISK_FREE=$(get_disk_free)
+# DISK_STATUS=$(health_status "$DISK_USAGE" "$DISK_WARNING" "$DISK_CRITICAL")
 
-LOCAL_IP=$(get_local_ip)
-INTERNET=$(get_internet_status)
+# LOCAL_IP=$(get_local_ip)
+# INTERNET=$(get_internet_status)
 
-print_header
+# print_header
 
-print_field "Hostname" "$HOSTNAME"
-print_field "User" "$CURRENT_USER"
-print_field "Date" "$CURRENT_DATE"
-print_field "Kernel" "$KERNEL"
-print_field "Architecture" "$ARCHITECTURE"
-print_field "Shell" "$SHELL_NAME"
-print_field "Uptime" "$UPTIME"
+# print_field "Hostname" "$HOSTNAME"
+# print_field "User" "$CURRENT_USER"
+# print_field "Date" "$CURRENT_DATE"
+# print_field "Kernel" "$KERNEL"
+# print_field "Architecture" "$ARCHITECTURE"
+# print_field "Shell" "$SHELL_NAME"
+# print_field "Uptime" "$UPTIME"
 
-print_field "CPU Health" "$CPU_STATUS"
-print_field "CPU Model" "$CPU_MODEL"
-print_field "CPU Cores" "$CPU_CORES"
-print_field "CPU Usage" "$CPU_USAGE"
+# print_field "CPU Health" "$CPU_STATUS"
+# print_field "CPU Model" "$CPU_MODEL"
+# print_field "CPU Cores" "$CPU_CORES"
+# print_field "CPU Usage" "$CPU_USAGE"
 
-print_field "Memory Health" "$MEMORY_STATUS"
-print_field "Memory Total" "$MEMORY_TOTAL"
-print_field "Memory Used" "$MEMORY_USED"
-print_field "Memory Free" "$MEMORY_FREE"
+# print_field "Memory Health" "$MEMORY_STATUS"
+# print_field "Memory Total" "$MEMORY_TOTAL"
+# print_field "Memory Used" "$MEMORY_USED"
+# print_field "Memory Free" "$MEMORY_FREE"
 
-print_field "Disk Health" "$DISK_STATUS"
-print_field "Disk Usage" "$DISK_USAGE"
-print_field "Disk Free" "$DISK_FREE"
+# print_field "Disk Health" "$DISK_STATUS"
+# print_field "Disk Usage" "$DISK_USAGE"
+# print_field "Disk Free" "$DISK_FREE"
 
-print_field "Local IP" "$LOCAL_IP"
-print_field "Internet" "$INTERNET"
+# print_field "Local IP" "$LOCAL_IP"
+# print_field "Internet" "$INTERNET"
 
-log_message "SysGuard report generated"
+# log_message "SysGuard report generated"
+
+
+#!/usr/bin/env bash
+
+##############################################
+# SysGuard
+##############################################
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+##############################################
+# Root Directory
+##############################################
+
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+##############################################
+# Load Configuration
+##############################################
+
+source "${PROJECT_ROOT}/config/thresholds.conf"
+
+##############################################
+# Load Modules
+##############################################
+
+source "${PROJECT_ROOT}/modules/utils.sh"
+source "${PROJECT_ROOT}/modules/logger.sh"
+
+##############################################
+# Ensure Directories
+##############################################
+
+create_directory "$REPORT_DIRECTORY"
+create_directory "$LOG_DIRECTORY"
+
+##############################################
+# Startup
+##############################################
+
+print_header "SysGuard Linux Monitoring Toolkit"
+
+log_info "SysGuard started."
+
+printf "\n"
+
+print_key_value "Project Root" "$PROJECT_ROOT"
+print_key_value "Reports" "$REPORT_DIRECTORY"
+print_key_value "Logs" "$LOG_DIRECTORY"
+
+printf "\n"
+
+print_section "Initialization"
+
+printf "Configuration Loaded\n"
+printf "Modules Loaded\n"
+printf "Directories Ready\n"
+
+printf "\n"
+
+log_info "Initialization completed."
+
+printf "SysGuard Runtime Ready.\n"
+
+printf "\n"
+
+log_info "Waiting for monitoring modules."
