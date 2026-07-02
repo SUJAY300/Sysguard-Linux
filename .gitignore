@@ -1,0 +1,30 @@
+# Logs
+logs/*.log
+
+# Reports
+reports/*.txt
+reports/*.json
+reports/*.csv
+
+# Temporary
+*.tmp
+*.swp
+*.bak
+
+# VS Code
+.vscode/
+
+# JetBrains
+.idea/
+
+# Shell
+*.out
+
+# macOS
+.DS_Store
+
+# Linux
+*~
+
+# Generated
+coverage/
