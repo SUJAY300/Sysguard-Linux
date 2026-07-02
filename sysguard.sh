@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ##############################################
-# SysGuard v0.2
+# SysGuard v0.3
 ##############################################
 
 set -Eeuo pipefail
@@ -31,6 +31,68 @@ source "${PROJECT_ROOT}/modules/network.sh"
 source "${PROJECT_ROOT}/modules/logger.sh"
 source "${PROJECT_ROOT}/modules/health.sh"
 source "${PROJECT_ROOT}/modules/process.sh"
+
+##############################################
+# CLI Arguments
+##############################################
+
+WATCH_MODE=false
+WATCH_INTERVAL=5
+GENERATE_REPORT=false
+
+show_help() {
+
+cat << EOF
+
+SysGuard v0.3
+
+Usage:
+
+./sysguard.sh [OPTION]
+
+Options
+
+--help          Show help
+--version       Show version
+--report        Save report
+--watch <sec>   Refresh every n seconds
+
+EOF
+
+}
+
+while [[ $# -gt 0 ]]
+do
+    case "$1" in
+
+        --help)
+            show_help
+            exit 0
+            ;;
+
+        --version)
+            echo "SysGuard v0.3"
+            exit 0
+            ;;
+
+        --report)
+            GENERATE_REPORT=true
+            shift
+            ;;
+
+        --watch)
+            WATCH_MODE=true
+            WATCH_INTERVAL="$2"
+            shift 2
+            ;;
+
+        *)
+            echo "Unknown option: $1"
+            exit 1
+            ;;
+
+    esac
+done
 
 ##############################################
 # Prepare Directories
@@ -144,9 +206,17 @@ log_info "SysGuard report generated."
 printf "\n"
 printf "SysGuard execution completed successfully.\n"
 
-REPORT_FILE=$(generate_report_name)
+if $GENERATE_REPORT
+then
+    REPORT_FILE=$(generate_report_name)
+    save_report "$REPORT_FILE"
 
-save_report "$REPORT_FILE"
+    printf "\n"
+    printf "Report saved to: %s\n" "$REPORT_FILE"
+fi
 
-printf "\n"
-printf "Report saved to: %s\n" "$REPORT_FILE"
+if $WATCH_MODE
+then
+    printf "\n"
+    printf "Watch Mode coming in next milestone.\n"
+fi

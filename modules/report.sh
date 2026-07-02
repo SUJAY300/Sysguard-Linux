@@ -4,7 +4,7 @@ print_header() {
 
     printf "\n"
     printf "=============================================\n"
-    printf "               SYSGUARD v0.1\n"
+    printf "               SYSGUARD v0.3\n"
     printf "=============================================\n\n"
 
 }
