@@ -17,3 +17,10 @@ print_field() {
     printf "%-15s : %s\n" "$label" "$value"
 
 }
+
+print_cpu_header() {
+    printf "\n"
+    printf "=============================================\n"
+    printf "               CPU Info\n"
+    printf "=============================================\n\n"
+}
