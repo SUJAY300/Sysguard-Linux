@@ -40,6 +40,7 @@ WATCH_MODE=false
 WATCH_INTERVAL=5
 GENERATE_REPORT=false
 GENERATE_JSON=false
+GENERATE_CSV=false
 
 show_help() {
 
@@ -57,6 +58,7 @@ Options
 --version       Show version
 --report        Save report
 --json          Save JSON report
+--csv           Save CSV report
 --watch <sec>   Refresh every n seconds
 
 EOF
@@ -84,6 +86,11 @@ do
 
         --json)
             GENERATE_JSON=true
+            shift
+            ;;
+
+        --csv)
+            GENERATE_CSV=true
             shift
             ;;
 
@@ -254,6 +261,11 @@ fi
 if $GENERATE_JSON
 then
     generate_json_report
+fi
+
+if $GENERATE_CSV
+then
+    generate_csv_report
 fi
 
 log_info "SysGuard execution completed."

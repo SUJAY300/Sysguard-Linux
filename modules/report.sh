@@ -141,3 +141,42 @@ EOF
 
     printf "\nJSON report saved to: %s\n" "$json_file"
 }
+
+generate_csv_report() {
+
+    local csv_file="${REPORT_DIRECTORY}/report_$(date +%Y-%m-%d_%H-%M-%S).csv"
+
+    {
+        echo "Field,Value"
+
+        echo "Hostname,$HOSTNAME"
+        echo "User,$CURRENT_USER"
+        echo "Date,$CURRENT_DATE"
+        echo "Kernel,$KERNEL"
+        echo "Architecture,$ARCHITECTURE"
+        echo "Shell,$SHELL_NAME"
+        echo "Uptime,$UPTIME"
+
+        echo "CPU Model,$CPU_MODEL"
+        echo "CPU Cores,$CPU_CORES"
+        echo "CPU Usage,$CPU_USAGE"
+        echo "CPU Status,$CPU_STATUS"
+
+        echo "Memory Total,$MEMORY_TOTAL"
+        echo "Memory Used,$MEMORY_USED"
+        echo "Memory Free,$MEMORY_FREE"
+        echo "Memory Status,$MEMORY_STATUS"
+
+        echo "Disk Usage,$DISK_USAGE"
+        echo "Disk Free,$DISK_FREE"
+        echo "Disk Status,$DISK_STATUS"
+
+        echo "Local IP,$LOCAL_IP"
+        echo "Internet,$INTERNET"
+
+    } > "$csv_file"
+
+    log_info "CSV report generated: $csv_file"
+
+    printf "\nCSV report saved to: %s\n" "$csv_file"
+}
