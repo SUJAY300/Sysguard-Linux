@@ -1,72 +1,51 @@
 # SysGuard
 
-> Professional Linux System Monitoring & Automation Toolkit
+> A modular Linux System Monitoring & Automation Toolkit built with Bash.
 
-SysGuard is a modular Linux monitoring toolkit written entirely in Bash.
+SysGuard is a production-inspired Linux monitoring tool that collects system information, monitors resource usage, generates reports, and provides a clean command-line interface.
 
-Instead of becoming another collection of shell scripts, SysGuard follows
-software engineering principles used in production environments.
-
-The project teaches:
-
-- Linux Internals
-- Bash Programming
-- Automation
-- Monitoring
-- Logging
-- Configuration Management
-- Software Design
-- Git Workflow
-- Documentation
-
----
-
-## Why SysGuard?
-
-Linux provides hundreds of useful commands.
-
-Professional engineers don't repeatedly type them manually.
-
-They automate them.
-
-SysGuard demonstrates how monitoring tools evolve from simple scripts into reusable engineering software.
+It was built as a learning project to strengthen Linux, Bash scripting, automation, and software engineering fundamentals.
 
 ---
 
 ## Features
 
 ### System Information
-
 - Hostname
-- Username
-- Current Date
-- Linux Distribution
+- Current User
+- Current Date & Time
 - Kernel Version
 - Architecture
 - Shell
 - Uptime
 
 ### Resource Monitoring
-
-- CPU
-- Memory
-- Disk
-
-### Process Monitoring
-
-- Top CPU Consumers
-- Top Memory Consumers
+- CPU Usage & Health
+- Memory Usage & Health
+- Disk Usage & Health
 
 ### Network Monitoring
-
-- Local IP
+- Local IP Address
 - Internet Connectivity
 
-### Reporting
+### Process Monitoring
+- Top CPU-consuming Processes
+- Top Memory-consuming Processes
 
+### Reporting
 - Terminal Dashboard
-- Timestamped Reports
-- Log Files
+- Timestamped Text Reports
+- JSON Export
+- CSV Export
+- Log File Generation
+
+### CLI Support
+- `--help`
+- `--version`
+- `--report`
+- `--json`
+- `--csv`
+- `--watch <seconds>`
 
 ---
 
@@ -79,92 +58,98 @@ sysguard/
 ├── logs/
 ├── modules/
 ├── reports/
+├── install.sh
+├── uninstall.sh
+├── sysguard.sh
 ├── README.md
 ├── LICENSE
-├── .gitignore
-└── sysguard.sh
+└── .gitignore
 ```
 
 ---
 
-## Design Goals
-
-- Modular
-- Readable
-- Extensible
-- Configurable
-- Production Inspired
-
----
-
-## Development Phases
-
-### Phase 1
-
-Core Monitoring
-
-### Phase 2
-
-Automation
-
-### Phase 3
-
-Professional CLI
-
----
-
-## Running
+## Installation
 
 ```bash
-chmod +x sysguard.sh
+chmod +x install.sh
+./install.sh
+```
 
-./sysguard.sh
+Run from anywhere:
+
+```bash
+sysguard
+```
+
+---
+
+## Usage
+
+```bash
+sysguard
+
+sysguard --report
+
+sysguard --json
+
+sysguard --csv
+
+sysguard --watch 5
+
+sysguard --help
 ```
 
 ---
 
 ## Requirements
 
-Linux
-
-Bash 5+
-
-Standard GNU utilities
+- Linux or WSL2 (Ubuntu)
+- Bash 5+
+- Standard GNU Utilities
 
 ---
 
-## Future Versions
+## Technologies Used
 
-Version 1
+- Bash
+- Linux
+- GNU Coreutils
+- awk
+- grep
+- ps
+- df
+- free
+- top
+- ping
 
-Bash Monitoring Tool
+---
 
-↓
+## Learning Objectives
 
-Version 2
+- Linux Fundamentals
+- Bash Scripting
+- Automation
+- System Monitoring
+- Logging
+- Configuration Management
+- Modular Software Design
+- Git Workflow
 
-Python Rewrite
+---
 
-↓
+## Roadmap
 
-Version 3
+### ✅ v1.0
+- Bash Monitoring Toolkit
 
-REST API
-
-↓
-
-Version 4
-
-Docker
-
-↓
-
-Version 5
-
-Monitoring Agent
+### 🚀 Future
+- Python Rewrite
+- REST API
+- Docker Support
+- Web Dashboard
 
 ---
 
 ## License
 
-MIT
+MIT License

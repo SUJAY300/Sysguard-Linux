@@ -10,7 +10,8 @@ set -Eeuo pipefail
 # Project Root
 ##############################################
 
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
+PROJECT_ROOT="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
 
 ##############################################
 # Load Configuration
@@ -32,6 +33,19 @@ source "${PROJECT_ROOT}/modules/logger.sh"
 source "${PROJECT_ROOT}/modules/health.sh"
 source "${PROJECT_ROOT}/modules/process.sh"
 
+error_handler() {
+    local exit_code=$?
+
+    log_error "SysGuard exited unexpectedly (Exit Code: $exit_code)"
+
+    printf "\n"
+    printf "An unexpected error occurred.\n"
+
+    exit "$exit_code"
+}
+
+trap error_handler ERR
+
 ##############################################
 # CLI Arguments
 ##############################################
@@ -46,7 +60,7 @@ show_help() {
 
 cat << EOF
 
-SysGuard v0.3
+SysGuard v0.5
 
 Usage:
 
@@ -113,8 +127,8 @@ do
             ;;
 
         *)
-            echo "Unknown option: $1"
-            exit 1
+            printf "Unknown option: %s\n" "$1" >&2
+            exit 2
             ;;
 
     esac
@@ -125,7 +139,9 @@ done
 ##############################################
 
 mkdir -p "$LOG_DIRECTORY"
-mkdir -p "$REPORT_DIRECTORY"
+if [[ ! -d "$REPORT_DIRECTORY" ]]; then
+    mkdir -p "$REPORT_DIRECTORY"
+fi
 
 log_info "SysGuard started."
 
