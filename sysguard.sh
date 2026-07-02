@@ -143,3 +143,10 @@ log_info "SysGuard report generated."
 
 printf "\n"
 printf "SysGuard execution completed successfully.\n"
+
+REPORT_FILE=$(generate_report_name)
+
+save_report "$REPORT_FILE"
+
+printf "\n"
+printf "Report saved to: %s\n" "$REPORT_FILE"
