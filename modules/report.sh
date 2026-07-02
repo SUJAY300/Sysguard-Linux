@@ -18,9 +18,3 @@ print_field() {
 
 }
 
-print_cpu_header() {
-    printf "\n"
-    printf "=============================================\n"
-    printf "               CPU Info\n"
-    printf "=============================================\n\n"
-}

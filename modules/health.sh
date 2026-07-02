@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source config/thresholds.conf
-
 health_status() {
     local value=$1
     local warn=$2
@@ -10,9 +8,9 @@ health_status() {
     value=${value%\%}
     value=${value%.*}
 
-    if [ "$value" -ge "$crit" ]; then
+    if [ $value -ge $crit ]; then
         echo "CRITICAL"
-    elif [ "$value" -ge "$warn" ]; then
+    elif [ $value -ge $warn ]; then
         echo "WARNING"
     else
         echo "HEALTHY"
