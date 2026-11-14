@@ -1,37 +1,11 @@
 #!/usr/bin/env bash
 
-##############################################
-# SysGuard v0.5
-##############################################
+# region Initialization
 
-set -Eeuo pipefail
+set -Eeuo pipefail  #-- sets strict mode
 
-##############################################
-# Project Root
-##############################################
-
-SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
+SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}")"  #--- Project Root
 PROJECT_ROOT="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
-
-##############################################
-# Load Configuration
-##############################################
-
-source "${PROJECT_ROOT}/config/thresholds.conf"
-
-##############################################
-# Load Modules
-##############################################
-
-source "${PROJECT_ROOT}/modules/system.sh"
-source "${PROJECT_ROOT}/modules/report.sh"
-source "${PROJECT_ROOT}/modules/cpu.sh"
-source "${PROJECT_ROOT}/modules/memory.sh"
-source "${PROJECT_ROOT}/modules/disk.sh"
-source "${PROJECT_ROOT}/modules/network.sh"
-source "${PROJECT_ROOT}/modules/logger.sh"
-source "${PROJECT_ROOT}/modules/health.sh"
-source "${PROJECT_ROOT}/modules/process.sh"
 
 error_handler() {
     local exit_code=$?
@@ -45,10 +19,31 @@ error_handler() {
 }
 
 trap error_handler ERR
+# endregion
 
-##############################################
-# CLI Arguments
-##############################################
+# region Configuration
+
+# Load Configuration
+
+source "${PROJECT_ROOT}/config/thresholds.conf"
+# endregion
+
+# region Module Loading
+# Load Modules
+
+source "${PROJECT_ROOT}/modules/system.sh"
+source "${PROJECT_ROOT}/modules/report.sh"
+source "${PROJECT_ROOT}/modules/cpu.sh"
+source "${PROJECT_ROOT}/modules/memory.sh"
+source "${PROJECT_ROOT}/modules/disk.sh"
+source "${PROJECT_ROOT}/modules/network.sh"
+source "${PROJECT_ROOT}/modules/logger.sh"
+source "${PROJECT_ROOT}/modules/health.sh"
+source "${PROJECT_ROOT}/modules/process.sh"
+
+# endregion
+
+# region CLI Arguments
 
 WATCH_MODE=false
 WATCH_INTERVAL=5
@@ -60,7 +55,7 @@ show_help() {
 
 cat << EOF
 
-SysGuard v0.5
+SysGuard v1.0
 
 Usage:
 
@@ -89,7 +84,7 @@ do
             ;;
 
         --version)
-            echo "SysGuard v0.5"
+            echo "SysGuard v1.0"
             exit 0
             ;;
 
@@ -133,12 +128,11 @@ do
 
     esac
 done
+# endregion
 
-##############################################
-# Prepare Directories
-##############################################
+# region Data Collection
 
-mkdir -p "$LOG_DIRECTORY"
+mkdir -p "$LOG_DIRECTORY"               # Prepare Directories
 if [[ ! -d "$REPORT_DIRECTORY" ]]; then
     mkdir -p "$REPORT_DIRECTORY"
 fi
@@ -146,11 +140,8 @@ fi
 log_info "SysGuard started."
 
 collect_data() {
-    ##############################################
-    # System Information
-    ##############################################
-
-    HOSTNAME=$(get_hostname)
+    
+    HOSTNAME=$(get_hostname)            # System Information
     CURRENT_USER=$(get_current_user)
     CURRENT_DATE=$(get_current_date)
     KERNEL=$(get_kernel_version)
@@ -158,51 +149,30 @@ collect_data() {
     SHELL_NAME=$(get_shell_name)
     UPTIME=$(get_uptime)
 
-    ##############################################
-    # CPU
-    ##############################################
-
-    CPU_MODEL=$(get_cpu_model)
+    CPU_MODEL=$(get_cpu_model)         # CPU
     CPU_CORES=$(get_cpu_cores)
     CPU_USAGE=$(get_cpu_usage)
     CPU_STATUS=$(health_status "$CPU_USAGE" "$CPU_WARNING" "$CPU_CRITICAL")
-
-    ##############################################
-    # Memory
-    ##############################################
-
-    MEMORY_TOTAL=$(get_memory_total)
+    
+    MEMORY_TOTAL=$(get_memory_total)   # Memory
     MEMORY_USED=$(get_memory_used)
     MEMORY_FREE=$(get_memory_free)
     MEMORY_PERCENT=$(free | awk '/Mem:/ {printf("%.0f%%",$3/$2*100)}')
     MEMORY_STATUS=$(health_status "$MEMORY_PERCENT" "$MEMORY_WARNING" "$MEMORY_CRITICAL")
 
-    ##############################################
-    # Disk
-    ##############################################
-
-    DISK_USAGE=$(get_disk_usage)
+    DISK_USAGE=$(get_disk_usage)       # Disk
     DISK_FREE=$(get_disk_free)
     DISK_STATUS=$(health_status "$DISK_USAGE" "$DISK_WARNING" "$DISK_CRITICAL")
 
-    ##############################################
-    # Network
-    ##############################################
-
-    LOCAL_IP=$(get_local_ip)
+    LOCAL_IP=$(get_local_ip)           # Network
     INTERNET=$(get_internet_status)
 
-    ##############################################
-    # Processes
-    ##############################################
-
-    TOP_CPU_PROCESSES=$(get_top_cpu_processes)
+    TOP_CPU_PROCESSES=$(get_top_cpu_processes)     # Processes
     TOP_MEMORY_PROCESSES=$(get_top_memory_processes)
 }
+# endregion
 
-##############################################
-# Output
-##############################################
+# region Output
 
 display_dashboard() {
     print_header
@@ -242,10 +212,9 @@ display_dashboard() {
     printf "======== Top Memory Processes =========\n"
     printf "%s\n" "$TOP_MEMORY_PROCESSES"
 }
+# endregion
 
-##############################################
-# Execution
-##############################################
+# region Mode
 
 if $WATCH_MODE
 then
@@ -260,12 +229,10 @@ then
     exit 0
 fi
 
-# Normal execution
-collect_data
+collect_data     # Normal execution
 display_dashboard
 
-# Optional report
-if $GENERATE_REPORT
+if $GENERATE_REPORT       # Optional report
 then
     REPORT_FILE=$(generate_report_name)
     save_report "$REPORT_FILE"
@@ -288,3 +255,4 @@ log_info "SysGuard execution completed."
 
 printf "\n"
 printf "SysGuard execution completed successfully.\n"
+# endregion
